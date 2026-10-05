@@ -27,7 +27,7 @@ Working state of the site. Keep this current when you make meaningful changes.
 - `images/` — portfolio photography (case-sensitive filenames; Netlify is case-sensitive)
 
 **Cache-busting:** after editing `styles.css` or `scripts.js`, bump the `?v=N` number
-on both `<link>`/`<script>` tags in `index.html` (currently `v=6`).
+on both `<link>`/`<script>` tags in `index.html` (currently `v=7`).
 
 ## Images (responsive WebP pipeline)
 
@@ -63,7 +63,7 @@ image well); back faces are dimmed.
   supports drag + inertia, and opens the existing lightbox on a (non-drag) click.
   - Featured photos: the `FEATURED` array (9 images, each also present in the grid so
     clicks map onto the lightbox). Edit that array to change the lineup.
-  - **Rotation speed:** `speedDegS` (currently **10.5 deg/s** — a full spin ≈ 34s).
+  - **Rotation speed:** `speedDegS` (currently **5.25 deg/s** — a full spin ≈ 69s).
   - Respects `prefers-reduced-motion` (auto-spin pauses; drag still works) and only
     animates while the window is visible.
 

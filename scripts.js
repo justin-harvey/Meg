@@ -295,7 +295,7 @@ var Desktop = (function () {
     var count       = FEATURED.length;
     var W = 190, H = 145;          // must match .rc-ring in styles.css
     var spacing     = 3;
-    var speedDegS   = 10.5;        // 10.5 deg/s — half of 21 (a quarter of the original 42)
+    var speedDegS   = 5.25;        // 5.25 deg/s — half of 10.5 (an eighth of the original 42)
     var sensitivity = 5;
     var angle  = 360 / count;
     var factor = 1 + spacing * 0.15;
