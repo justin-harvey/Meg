@@ -278,22 +278,24 @@ var Desktop = (function () {
 
     /* Curated subset — each src/label also exists in the grid below,
        so a click maps cleanly onto the lightbox. */
+    /* thumb = small WebP shown on the spinning face; full = large WebP that
+       also matches the grid's data-src so a click opens the lightbox. */
     var FEATURED = [
-      { src: 'images/photos-1-2.jpeg', label: 'Color Transformation' },
-      { src: 'images/img_3197.jpg',    label: 'Color & Dimension' },
-      { src: 'images/photos-1-7.jpeg', label: 'Cut & Texture' },
-      { src: 'images/img_5895.jpg',    label: 'Ready' },
-      { src: 'images/IMG_5896.JPG',    label: 'Vivid Result' },
-      { src: 'images/IMG_3200.JPG',    label: 'Final Look' },
-      { src: 'images/img_3624.jpg',    label: 'Studio Styling' },
-      { src: 'images/photos-1-8.jpeg', label: 'Textured Layers' },
-      { src: 'images/72CB9D5F-D97F-4E5A-8C3C-2FA5B465DCBA.jpg', label: 'Color Expression' }
+      { thumb: 'images/opt/photos-1-2-sm.webp', full: 'images/opt/photos-1-2-lg.webp', label: 'Color Transformation' },
+      { thumb: 'images/opt/img_3197-sm.webp',   full: 'images/opt/img_3197-lg.webp',   label: 'Color & Dimension' },
+      { thumb: 'images/opt/photos-1-7-sm.webp', full: 'images/opt/photos-1-7-lg.webp', label: 'Cut & Texture' },
+      { thumb: 'images/opt/img_5895-sm.webp',   full: 'images/opt/img_5895-lg.webp',   label: 'Ready' },
+      { thumb: 'images/opt/IMG_5896-sm.webp',   full: 'images/opt/IMG_5896-lg.webp',   label: 'Vivid Result' },
+      { thumb: 'images/opt/IMG_3200-sm.webp',   full: 'images/opt/IMG_3200-lg.webp',   label: 'Final Look' },
+      { thumb: 'images/opt/img_3624-sm.webp',   full: 'images/opt/img_3624-lg.webp',   label: 'Studio Styling' },
+      { thumb: 'images/opt/photos-1-8-sm.webp', full: 'images/opt/photos-1-8-lg.webp', label: 'Textured Layers' },
+      { thumb: 'images/opt/72CB9D5F-D97F-4E5A-8C3C-2FA5B465DCBA-sm.webp', full: 'images/opt/72CB9D5F-D97F-4E5A-8C3C-2FA5B465DCBA-lg.webp', label: 'Color Expression' }
     ];
 
     var count       = FEATURED.length;
     var W = 190, H = 145;          // must match .rc-ring in styles.css
     var spacing     = 3;
-    var speedDegS   = 21;          // component speed 3.5 * 6 deg/s (half of original 42)
+    var speedDegS   = 10.5;        // 10.5 deg/s — half of 21 (a quarter of the original 42)
     var sensitivity = 5;
     var angle  = 360 / count;
     var factor = 1 + spacing * 0.15;
@@ -323,10 +325,10 @@ var Desktop = (function () {
       tb.appendChild(text);
       var pic = document.createElement('div');
       pic.className = 'rc-pic';
-      pic.style.backgroundImage = 'url("' + img.src + '")';
+      pic.style.backgroundImage = 'url("' + img.thumb + '")';
       face.appendChild(tb);
       face.appendChild(pic);
-      if (!isBack) { face.dataset.src = img.src; face.dataset.label = img.label; }
+      if (!isBack) { face.dataset.src = img.full; face.dataset.label = img.label; }
       return face;
     }
 
