@@ -267,6 +267,149 @@ var Desktop = (function () {
     open('win-lightbox');
   }
 
+  /* ── Featured 3D round carousel (Win95-framed) ─────────────
+     Vanilla port of the "Round Carousel" component. Builds a 3D
+     ring of framed photos, auto-spins it, supports drag + inertia,
+     and opens the existing lightbox when a frame is clicked. */
+  function initRoundCarousel() {
+    var stage = document.getElementById('rc-stage');
+    var ring  = document.getElementById('rc-ring');
+    if (!stage || !ring) return;
+
+    /* Curated subset — each src/label also exists in the grid below,
+       so a click maps cleanly onto the lightbox. */
+    var FEATURED = [
+      { src: 'images/photos-1-2.jpeg', label: 'Color Transformation' },
+      { src: 'images/img_3197.jpg',    label: 'Color & Dimension' },
+      { src: 'images/photos-1-7.jpeg', label: 'Cut & Texture' },
+      { src: 'images/img_5895.jpg',    label: 'Ready' },
+      { src: 'images/IMG_5896.JPG',    label: 'Vivid Result' },
+      { src: 'images/IMG_3200.JPG',    label: 'Final Look' },
+      { src: 'images/img_3624.jpg',    label: 'Studio Styling' },
+      { src: 'images/photos-1-8.jpeg', label: 'Textured Layers' },
+      { src: 'images/72CB9D5F-D97F-4E5A-8C3C-2FA5B465DCBA.jpg', label: 'Color Expression' }
+    ];
+
+    var count       = FEATURED.length;
+    var W = 190, H = 145;          // must match .rc-ring in styles.css
+    var spacing     = 3;
+    var speedDegS   = 21;          // component speed 3.5 * 6 deg/s (half of original 42)
+    var sensitivity = 5;
+    var angle  = 360 / count;
+    var factor = 1 + spacing * 0.15;
+    var radius = (W * factor) / (2 * Math.tan(Math.PI / count));
+
+    FEATURED.forEach(function (img, i) {
+      var item = document.createElement('div');
+      item.className = 'rc-item';
+      item.style.transform = 'rotateY(' + (i * angle) + 'deg) translateZ(' + radius + 'px)';
+      item.appendChild(buildFace(img, false));
+      item.appendChild(buildFace(img, true));
+      ring.appendChild(item);
+    });
+
+    function buildFace(img, isBack) {
+      var face = document.createElement('div');
+      face.className = 'rc-face' + (isBack ? ' rc-face-back' : '');
+      var tb = document.createElement('div');
+      tb.className = 'rc-titlebar';
+      var icon = document.createElement('span');
+      icon.className = 'rc-tb-icon';
+      icon.textContent = '🖼';
+      var text = document.createElement('span');
+      text.className = 'rc-tb-text';
+      text.textContent = img.label;
+      tb.appendChild(icon);
+      tb.appendChild(text);
+      var pic = document.createElement('div');
+      pic.className = 'rc-pic';
+      pic.style.backgroundImage = 'url("' + img.src + '")';
+      face.appendChild(tb);
+      face.appendChild(pic);
+      if (!isBack) { face.dataset.src = img.src; face.dataset.label = img.label; }
+      return face;
+    }
+
+    /* ── Animation + drag (mirrors the component's RAF loop) ── */
+    var reduce = window.matchMedia &&
+                 window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var degPerSec = reduce ? 0 : speedDegS;
+    var rotY = 0, vel = 0, last = 0, raf = 0;
+    var drag = { active: false, x: 0, moved: 0 };
+
+    function apply() {
+      ring.style.transform = 'translateZ(' + (-radius) + 'px) rotateY(' + rotY + 'deg)';
+    }
+    apply();
+
+    function draw(now) {
+      var dt = last ? (now - last) / 1000 : 0;
+      last = now;
+      var f = Math.min(dt, 0.1);
+      if (stage.offsetParent !== null) {   // only spin while the window is visible
+        if (!drag.active) {
+          if (Math.abs(vel) > 0.01) {
+            rotY += vel * f;
+            vel  *= 0.94;
+          } else {
+            rotY += degPerSec * f;
+          }
+        }
+        apply();
+      }
+      raf = requestAnimationFrame(draw);
+    }
+    raf = requestAnimationFrame(draw);
+
+    stage.addEventListener('pointerdown', function (e) {
+      if (stage.setPointerCapture) stage.setPointerCapture(e.pointerId);
+      drag = { active: true, x: e.clientX, moved: 0 };
+      vel = 0;
+      stage.classList.add('is-grabbing');
+    });
+    stage.addEventListener('pointermove', function (e) {
+      if (!drag.active) return;
+      var dx = e.clientX - drag.x;
+      drag.x = e.clientX;
+      drag.moved += Math.abs(dx);
+      var k = 0.3 * sensitivity;
+      rotY += dx * k;
+      vel = dx * k * 60;
+    });
+    function endDrag(e) {
+      if (stage.releasePointerCapture) {
+        try { stage.releasePointerCapture(e.pointerId); } catch (err) {}
+      }
+      var wasClick = drag.active && drag.moved < 6;
+      drag.active = false;
+      stage.classList.remove('is-grabbing');
+      if (wasClick) openFace(e);
+    }
+    stage.addEventListener('pointerup', endDrag);
+    stage.addEventListener('pointercancel', function (e) {
+      drag.active = false;
+      stage.classList.remove('is-grabbing');
+    });
+
+    function openFace(e) {
+      var face = e.target.closest('.rc-face');
+      if (!face || !face.dataset.src) return;   // ignore dim back faces
+      var src = face.dataset.src;
+      var thumbs = Array.from(document.querySelectorAll('.photo-thumb:not(.hidden)'));
+      var idx = thumbs.findIndex(function (t) { return t.dataset.src === src; });
+      if (idx >= 0) {
+        showLb(idx);   // showLb re-reads the visible thumbs itself
+      } else {
+        /* featured image filtered out of the grid — show it directly */
+        var img   = document.getElementById('lb-img');
+        var title = document.getElementById('lb-title');
+        if (img)   img.src = src;
+        if (title) title.textContent = (face.dataset.label || 'Photo') + ' — Photo Viewer';
+        open('win-lightbox');
+      }
+    }
+  }
+
   /* ── Clock ────────────────────────────────────────────── */
   function updateClock() {
     var now = new Date();
@@ -375,6 +518,7 @@ var Desktop = (function () {
 
     initFilters();
     initPhotoGrid();
+    initRoundCarousel();
 
     /* Dynamic portfolio object count */
     var photoCount = document.querySelectorAll('.photo-thumb').length;

@@ -27,7 +27,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=4">
+  <link rel="stylesheet" href="styles.css?v=5">
 
   <!-- Structured Data -->
   <script type="application/ld+json">
@@ -373,6 +373,20 @@
       </div>
     </div>
     <div class="win-body photo-explorer">
+      <!-- ── Featured 3D Carousel (Win95-framed round carousel) ── -->
+      <div class="rc-shell">
+        <div class="rc-hint">
+          <span class="rc-hint-icon">🖱️</span>
+          <span>Featured work — drag to spin, click a frame to enlarge</span>
+        </div>
+        <div class="rc-stage" id="rc-stage" aria-label="Rotating featured work carousel">
+          <div class="rc-scaler">
+            <div class="rc-tilt">
+              <div class="rc-ring" id="rc-ring"><!-- framed faces built by scripts.js --></div>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="photo-grid" id="photo-grid">
         <div class="photo-thumb color" data-src="images/photos-1.jpeg" data-label="Vivid Color">
           <img src="images/photos-1.jpeg" alt="Vivid Color" loading="lazy">
@@ -834,6 +848,6 @@
 
 </div><!-- /#desktop -->
 
-<script src="scripts.js?v=4"></script>
+<script src="scripts.js?v=5"></script>
 </body>
 </html>
